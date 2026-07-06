@@ -1,0 +1,153 @@
+SELECT age, platform, daily_listening_minutes, songs_per_day
+FROM `musichabits-501505.Musichabits.Music ` as Music
+limit 10;
+
+-- Dashboard 1
+-- 1. Which subscription type (Free, Premium, Student, Family) has the highest average daily listening time, and what does that tell us about customer value?
+select subscription, avg (daily_listening_minutes) as avg_daily_listening_minutes
+from `Musichabits.Music `
+group by subscription
+order by avg_daily_listening_minutes desc;
+-- The student subscription has the highest average daily listening time 
+
+-- 2. Do users who use Discover Weekly listen listen to music longer, skip fewer songs, or create more playlists than users who don't use it 
+select discover_weekly_user, avg(daily_listening_minutes) as avg_daily_listening_users, avg(skip_rate_pct) as avg_skip_rate, avg(playlists_count) as avg_playlist_count
+from `Musichabits.Music `
+group by discover_weekly_user
+-- True: users who use dicover weekly average less daily listening, skip more songs, and have a higher playlist count
+-- False: users who don't use discover weekly average more daily listening, skip less songs, and have lower playlist count 
+
+-- -- 3. Which age groups show the strongest engagement?
+select age, daily_listening_minutes, songs_per_day
+from `Musichabits.Music `
+where age between 13 and 18
+order by age desc;
+
+select
+  avg(age) as avg_age,
+  avg(daily_listening_minutes) as avg_daily_listening_minutes,
+  avg(songs_per_day) as avg_songs_per_day
+from
+  `Musichabits.Music `
+where
+  age between 13
+  and 18
+Select round(14.83544, 0) as avg_age_rounded 
+select round(126.4936, 0) as avg_daily_listening_minutes_rounded
+select round (35.34177, 0) as avg_songs_per_day_rounded
+-- The average age is 15
+-- The average daily listening is 126
+-- The average songs per day is 35
+-- There are 79 people between 13-18
+
+select
+  avg(age) as avg_age,
+  avg(daily_listening_minutes) as avg_daily_listening_minutes,
+  avg(songs_per_day) as avg_songs_per_day
+from
+  `Musichabits.Music `
+where
+  age between 19
+  and 25
+select round (22.4666, 0) as avg_age_rounded 
+select round (153.03333, 0) as avg_daily_listening_minutes_rounded
+select round (43.07499, 0) as avg_songs_per_day
+-- The average age is 22
+-- The average daily listeners is 153
+-- The average songs per day is 43
+-- There are 120 people between 19-25
+
+select
+  avg(age) as avg_age,
+  avg(daily_listening_minutes) as avg_daily_listening_minutes,
+  avg(songs_per_day) as avg_songs_per_day
+from
+  `Musichabits.Music `
+where
+  age between 26
+  and 40
+select round (32.37984, 0) as avg_age_rounded 
+select round (132.5426, 0) as avg_daily_listening_rounded 
+select round (37.3333,0) as avg_songs_per_day_rounded
+-- The average age is 32 
+-- The average daily listening is 133
+-- Te average songs per day is 37
+-- There are 258 people between 26-40 
+
+select
+  avg(age) as avg_age,
+  avg(daily_listening_minutes) as avg_daily_listening_minutes,
+  avg(songs_per_day) as avg_songs_per_day
+from
+  `Musichabits.Music `
+where
+  age between 41
+  and 60
+select round (44.19047, 0) as avg_age_rounded 
+select round (138.64285, 0) as avg_daily_listening_rounded
+select round (38.7619, 0) as avg_songs_per_day_rounded
+-- The averageage is 44
+-- The average daily listening is 139
+-- The average songs per day is 39
+-- There are 42 poeple between 41-60
+
+-- The ages 19-25 show the strongest engagement
+
+-- 4. Which genre has the highest and lowest daily listening time?
+select max(daily_listening_minutes) as max_daily_listening_minutes, top_genre
+from `Musichabits.Music `
+group by top_genre
+-- The Hip-Hop genre has the highest daily listening time
+
+-- 5. Which country has the highest and lowest listening time?
+select max(daily_listening_minutes) as max_daily_listening_minutes, min (daily_listening_minutes) as min_daily_listening_minutes, country
+from `Musichabits.Music `
+group by country
+order by country asc;
+-- United Kingdom has the highest listening time
+-- Brazil has the lowest listening time 
+
+-- 6. Can we combine genre and mood into a single “content preference” category to see which combinations are most common? Give me the top five?
+select top_genre, top_mood, count(*) as Content_Preference
+from `Musichabits.Music `
+group by top_genre, top_mood
+having Content_Preference > 1
+order by Content_Preference desc
+limit 5;
+-- By looking at the data we can see that top genre (POP) and top mood (HAPPY) are the most common combination along with the others 
+
+-- 7. -- How can we create a listener profile label that combines each user’s subscription type, favorite genre, and listening mood into one customer segment description?
+select listener_id,
+  concat(subscription, ' - ', top_genre, ' - ', top_mood) as listener_profile_label
+from `Musichabits.Music `
+
+-- 8. Which platform has the most total daily listening?
+select platform, sum(daily_listening_minutes) as total_daily_listening_minutes
+from `Musichabits`.`Music `
+group by platform
+order by sum(daily_listening_minutes) desc
+-- The platform with the most total daily listening is Spotify
+
+-- 9. How many users are on each subscription plan?
+select subscription, count(listener_id) as user_count
+from `Musichabits.Music `
+group by subscription
+-- The free subscription has the most users, as the student subsription has the least users 
+
+
+-- Dashboard 2
+-- 10. Who is the top artist that the users listen to?
+select top_artist, count(listener_id) as user_count
+from `Musichabits.Music `
+group by top_artist
+having user_count > 1
+order by user_count desc
+-- Olivia Rodrigo is the #1 artist that the users are listening to
+
+-- 11. What artist has the lowest listners from users 
+select top_artist, count(listener_id) as user_count
+from `Musichabits.Music `
+group by top_artist
+having user_count > 1
+order by user_count asc
+-- Ariana Grande has the lowest listening count from users
